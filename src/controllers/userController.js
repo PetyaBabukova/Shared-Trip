@@ -3,8 +3,7 @@ const userManager = require('../managers/userManager');
 const tripManager = require('../managers/tripManager');
 const { TOKEN_KEY } = require('../config/config');
 const { getErrorMessage } = require('../utils/errorHelpers');
-const Trip = require('../models/Trip')
-
+const Trip = require('../models/Trip');
 
 router.get('/login', (req, res) => {
     res.render('users/login')
@@ -17,13 +16,14 @@ router.post('/login', async (req, res) => {
         const token = await userManager.login(email, password);
 
         res.cookie(TOKEN_KEY, token);
-
-        res.redirect('/');
+        res.render('home', {email} );
 
     } catch (err) {
+        console.log(err);
         res.render('users/login', { error: getErrorMessage(err) });
     }
 });
+
 
 router.get('/register', (req, res) => {
     res.render('users/register')
