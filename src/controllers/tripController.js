@@ -6,7 +6,6 @@ const tripManager = require('../managers/tripManager');
 router.get('/',  async (req, res) => {
     try {
         const trips = await tripManager.getAll();
-        console.log(trips);
         res.render('trips/shared-trips', { trips });
     } catch (error) {
         res.status(404).render('home', { error: 'Failed to fetch trips.' });
@@ -46,25 +45,28 @@ router.get('/:tripId/details', async (req, res) => {
     try {
         const tripId = req.params.tripId;
         const trip = await tripManager.getOne(tripId).lean();
+
+        let availableSeats = trip.seats - trip.join.length
+
+        let isAvailableSeats = availableSeats>0
         
-        let count = trip.votes.length;
 
         if (!trip) {
             res.status(404).send("trip not found");
             return;
         }
 
-        let voted = [];
-        trip.votes.forEach(x => {
-            voted.push(x._id.toString());
+        let joined = [];
+        trip.join.forEach(x => {
+            joined.push(x._id.toString());
         });
 
-        let hasVoted = voted.includes(req.user?._id.toString());
-        let isAnyVote = trip.votes.length>0
+        let hasJoined = joined.includes(req.user?._id.toString());
+        let isAnyJoined = trip.join.length>0
         const isOwner = req.user?._id.toString() === trip.owner._id.toString();
         const isLogged = Boolean(req.user);
 
-        res.render('trips/details', { ...trip, count, isOwner, isLogged, hasVoted, isAnyVote });
+        res.render('trips/details', { ...trip, isOwner, isLogged, hasJoined, isAnyJoined, availableSeats, isAvailableSeats });
 
     } catch (error) {
         res.status(500).send('An error occurred while retrieving trip details.');
@@ -111,32 +113,32 @@ router.get('/:tripId/delete', async (req, res) => {
 
 })
 
-// router.get('/:tripId/vote', async (req, res) => {
-//     const tripId = req.params.tripId;
-//     const user = req.user;
-//     const trip = await tripManager.getOne(tripId).lean();
+router.get('/:tripId/join', async (req, res) => {
+    const tripId = req.params.tripId;
+    const user = req.user;
+    const trip = await tripManager.getOne(tripId).lean();
 
-//     const isOwner = req.user?._id.toString() === trip.owner._id.toString();
-//     const isLogged = Boolean(req.user);
-//     // console.log(isLogged);
+    const isOwner = req.user?._id.toString() === trip.owner._id.toString();
+    const isLogged = Boolean(req.user);
+    // console.log(isLogged);
 
-//     if (isLogged && !isOwner) {
-//         try {
-//             await tripManager.vote(tripId, user._id);
-//             res.redirect(`/trips/${tripId}/details`);
-//         } catch (err) {
+    if (isLogged && !isOwner) {
+        try {
+            await tripManager.join(tripId, user._id);
+            res.redirect(`/trips/${tripId}/details`);
+        } catch (err) {
 
-//             console.log(err);
-//             res.render('trips/details', {
-//                 ...trip,
-//                 error: 'You cannot vote',
-//                 isOwner,
-//                 isLogged,
-//             });
-//         }
-//     } else {
-//         res.redirect(`/trips/${tripId}/details`);
-//     }
-// });
+            console.log(err);
+            res.render('trips/details', {
+                ...trip,
+                error: 'You cannot join',
+                isOwner,
+                isLogged,
+            });
+        }
+    } else {
+        res.redirect(`/trips/${tripId}/details`);
+    }
+});
 
 module.exports = router;

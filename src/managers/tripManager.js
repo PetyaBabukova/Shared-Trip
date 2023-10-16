@@ -4,20 +4,20 @@ exports.create = (TripData) => Trip.create(TripData);
 
 exports.getAll = () => Trip.find().lean().populate('owner');
 
-exports.getOne = (TripId) => Trip.findById(TripId).populate('owner').populate('votes');
+exports.getOne = (TripId) => Trip.findById(TripId).populate('owner').populate('join');
 
 exports.edit = (TripId, TripData) => Trip.findByIdAndUpdate(TripId, TripData);
 
 exports.delete = (TripId,) => Trip.findByIdAndDelete(TripId);
 
-exports.vote = async (TripId, userId) => {
-    const Trip = await Trip.findById(TripId);
+exports.join = async (TripId, userId) => {
+    const trip = await Trip.findById(TripId);
 
-    if (!Trip.votes.includes(userId.toString())) {
-        Trip.votes.push(userId);
-        await Trip.save();
+    if (!trip.join.includes(userId.toString())) {
+        trip.join.push(userId);
+        await trip.save();
     }
-    return Trip;
+    return trip;
 };
 
 exports.getAllOwnTrips = async (userId) => {

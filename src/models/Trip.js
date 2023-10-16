@@ -59,7 +59,7 @@ const TripSchema = new mongoose.Schema({
         ref: 'User'
     },
 
-    votes: [{
+    join: [{
         type: mongoose.Types.ObjectId,
         ref: 'User'
     }],
