@@ -3,16 +3,14 @@ const User = require('../models/User')
 const router = require('express').Router();
 const tripManager = require('../managers/tripManager');
 
-router.get('/',  (req, res) => {
-    console.log(req.body);
-    res.render('trips/shared-trips')
-
-    // try {
-    //     const creatures = await tripManager.getAll();
-    //     res.render('creatures', { creatures });
-    // } catch (error) {
-    //     res.status(404).render('home', { error: 'Failed to fetch creatures.' });
-    // }
+router.get('/',  async (req, res) => {
+    try {
+        const trips = await tripManager.getAll();
+        console.log(trips);
+        res.render('trips/shared-trips', { trips });
+    } catch (error) {
+        res.status(404).render('home', { error: 'Failed to fetch trips.' });
+    }
 });
 
 router.get('/create', (req, res) => {
@@ -20,124 +18,125 @@ router.get('/create', (req, res) => {
         res.render('trips/create');
 
     } catch (error) {
-        res.status(404).render('home', { error: 'Failed to get Add creature page.' });
+        res.status(404).render('home', { error: 'Failed to get Add trips page.' });
     }
 });
 
 router.post('/create', async (req, res) => {
-    const creatureData = {
+
+    const tripData = {
         ...req.body,
         owner: req.user._id
     }
 
     try {
-        await tripManager.create(creatureData)
-        res.redirect('/creatures')
+        await tripManager.create(tripData)
+        res.redirect('/trips')
 
     } catch (error) {
 
-        res.render('creatures/create', {
-            error: 'creature creation failed',
-            data: creatureData
+        res.render('trips/create', {
+            error: 'Trip creation failed',
+            data: tripData
         });
     }
 });
 
-router.get('/:creatureId/details', async (req, res) => {
+router.get('/:tripId/details', async (req, res) => {
     try {
-        const creatureId = req.params.creatureId;
-        const creature = await tripManager.getOne(creatureId).lean();
+        const tripId = req.params.tripId;
+        const trip = await tripManager.getOne(tripId).lean();
         
-        let count = creature.votes.length;
+        let count = trip.votes.length;
 
-        if (!creature) {
-            res.status(404).send("creature not found");
+        if (!trip) {
+            res.status(404).send("trip not found");
             return;
         }
 
         let voted = [];
-        creature.votes.forEach(x => {
+        trip.votes.forEach(x => {
             voted.push(x._id.toString());
         });
 
         let hasVoted = voted.includes(req.user?._id.toString());
-        let isAnyVote = creature.votes.length>0
-        const isOwner = req.user?._id.toString() === creature.owner._id.toString();
+        let isAnyVote = trip.votes.length>0
+        const isOwner = req.user?._id.toString() === trip.owner._id.toString();
         const isLogged = Boolean(req.user);
 
-        res.render('creatures/details', { ...creature, count, isOwner, isLogged, hasVoted, isAnyVote });
+        res.render('trips/details', { ...trip, count, isOwner, isLogged, hasVoted, isAnyVote });
 
     } catch (error) {
-        res.status(500).send('An error occurred while retrieving creature details.');
+        res.status(500).send('An error occurred while retrieving trip details.');
         console.log(error);
     }
 });
 
 
-router.get('/:creatureId/edit', async (req, res) => {
-    const creatureId = req.params.creatureId;
+router.get('/:tripId/edit', async (req, res) => {
+    const tripId = req.params.tripId;
 
     try {
-        const creature = await tripManager.getOne(creatureId).lean();
-        res.render('creatures/edit', { ...creature })
+        const trip = await tripManager.getOne(tripId).lean();
+        res.render('trips/edit', { ...trip })
 
     } catch (error) {
-        res.render('home', { error: 'Edit creature Edit page failed' })
+        res.render('home', { error: 'Edit trip Edit page failed' })
     }
 });
 
-router.post('/:creatureId/edit', async (req, res) => {
-    const creatureId = req.params.creatureId;
-    const creatureData = req.body
+router.post('/:tripId/edit', async (req, res) => {
+    const tripId = req.params.tripId;
+    const tripData = req.body
 
     try {
-        const creature = await tripManager.edit(creatureId, creatureData);
-        res.redirect(`/creatures/${creatureId}/details`);
+        const trip = await tripManager.edit(tripId, tripData);
+        res.redirect(`/trips/${tripId}/details`);
     } catch (error) {
-        res.render('creatures/edit', { error: 'Unable to update creature', ...creatureData })
+        res.render('trips/edit', { error: 'Unable to update trip', ...tripData })
     }
 
 });
 
-router.get('/:creatureId/delete', async (req, res) => {
+router.get('/:tripId/delete', async (req, res) => {
 
     try {
-        const creatureId = req.params.creatureId;
-        await tripManager.delete(creatureId);
-        res.redirect('/creatures')
+        const tripId = req.params.tripId;
+        await tripManager.delete(tripId);
+        res.redirect('/trips')
 
     } catch (error) {
-        res.redirect(`/creatures/${creatureId}/details`, { error: 'Unsuccessful deletion' })
+        res.redirect(`/trips/${tripId}/details`, { error: 'Unsuccessful deletion' })
     }
 
 })
 
-router.get('/:creatureId/vote', async (req, res) => {
-    const creatureId = req.params.creatureId;
-    const user = req.user;
-    const creature = await tripManager.getOne(creatureId).lean();
+// router.get('/:tripId/vote', async (req, res) => {
+//     const tripId = req.params.tripId;
+//     const user = req.user;
+//     const trip = await tripManager.getOne(tripId).lean();
 
-    const isOwner = req.user?._id.toString() === creature.owner._id.toString();
-    const isLogged = Boolean(req.user);
-    // console.log(isLogged);
+//     const isOwner = req.user?._id.toString() === trip.owner._id.toString();
+//     const isLogged = Boolean(req.user);
+//     // console.log(isLogged);
 
-    if (isLogged && !isOwner) {
-        try {
-            await tripManager.vote(creatureId, user._id);
-            res.redirect(`/creatures/${creatureId}/details`);
-        } catch (err) {
+//     if (isLogged && !isOwner) {
+//         try {
+//             await tripManager.vote(tripId, user._id);
+//             res.redirect(`/trips/${tripId}/details`);
+//         } catch (err) {
 
-            console.log(err);
-            res.render('creatures/details', {
-                ...creature,
-                error: 'You cannot vote',
-                isOwner,
-                isLogged,
-            });
-        }
-    } else {
-        res.redirect(`/creatures/${creatureId}/details`);
-    }
-});
+//             console.log(err);
+//             res.render('trips/details', {
+//                 ...trip,
+//                 error: 'You cannot vote',
+//                 isOwner,
+//                 isLogged,
+//             });
+//         }
+//     } else {
+//         res.redirect(`/trips/${tripId}/details`);
+//     }
+// });
 
 module.exports = router;

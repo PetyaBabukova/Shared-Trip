@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
         const token = await userManager.login(email, password);
 
         res.cookie(TOKEN_KEY, token);
-        res.render('home', {email} );
+        res.redirect('/' );
 
     } catch (err) {
         console.log(err);

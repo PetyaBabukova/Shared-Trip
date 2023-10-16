@@ -1,26 +1,26 @@
-const Creature = require('../models/Trip');
+const Trip = require('../models/Trip');
 
-exports.create = (creatureData) => Creature.create(creatureData);
+exports.create = (TripData) => Trip.create(TripData);
 
-exports.getAll = () => Creature.find().lean().populate('owner');
+exports.getAll = () => Trip.find().lean().populate('owner');
 
-exports.getOne = (creatureId) => Creature.findById(creatureId).populate('owner').populate('votes');
+exports.getOne = (TripId) => Trip.findById(TripId).populate('owner').populate('votes');
 
-exports.edit = (creatureId, creatureData) => Creature.findByIdAndUpdate(creatureId, creatureData);
+exports.edit = (TripId, TripData) => Trip.findByIdAndUpdate(TripId, TripData);
 
-exports.delete = (creatureId,) => Creature.findByIdAndDelete(creatureId);
+exports.delete = (TripId,) => Trip.findByIdAndDelete(TripId);
 
-exports.vote = async (creatureId, userId) => {
-    const creature = await Creature.findById(creatureId);
+exports.vote = async (TripId, userId) => {
+    const Trip = await Trip.findById(TripId);
 
-    if (!creature.votes.includes(userId.toString())) {
-        creature.votes.push(userId);
-        await creature.save();
+    if (!Trip.votes.includes(userId.toString())) {
+        Trip.votes.push(userId);
+        await Trip.save();
     }
-    return creature;
+    return Trip;
 };
 
-exports.getAllOwnCreatures = async (userId) => {
-    const ownCreatures = await Creature.find({owner: userId}).populate('owner').lean();
-    return ownCreatures;
+exports.getAllOwnTrips = async (userId) => {
+    const ownTrips = await Trip.find({owner: userId}).populate('owner').lean();
+    return ownTrips;
 };

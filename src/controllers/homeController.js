@@ -2,8 +2,10 @@ const router = require('express').Router();
 
 
 router.get('/', async (req, res) => {
-
-            res.render('home', );
+        // if(req.user){
+        //     console.log(req.user.email);
+        // }
+            res.render('home' );
             
     });
 
