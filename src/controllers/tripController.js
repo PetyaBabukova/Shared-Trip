@@ -1,0 +1,143 @@
+const User = require('../models/User')
+
+const router = require('express').Router();
+const tripManager = require('../managers/tripManager');
+
+router.get('/',  (req, res) => {
+    console.log(req.body);
+    res.render('trips/shared-trips')
+
+    // try {
+    //     const creatures = await tripManager.getAll();
+    //     res.render('creatures', { creatures });
+    // } catch (error) {
+    //     res.status(404).render('home', { error: 'Failed to fetch creatures.' });
+    // }
+});
+
+router.get('/create', (req, res) => {
+    try {
+        res.render('trips/create');
+
+    } catch (error) {
+        res.status(404).render('home', { error: 'Failed to get Add creature page.' });
+    }
+});
+
+router.post('/create', async (req, res) => {
+    const creatureData = {
+        ...req.body,
+        owner: req.user._id
+    }
+
+    try {
+        await tripManager.create(creatureData)
+        res.redirect('/creatures')
+
+    } catch (error) {
+
+        res.render('creatures/create', {
+            error: 'creature creation failed',
+            data: creatureData
+        });
+    }
+});
+
+router.get('/:creatureId/details', async (req, res) => {
+    try {
+        const creatureId = req.params.creatureId;
+        const creature = await tripManager.getOne(creatureId).lean();
+        
+        let count = creature.votes.length;
+
+        if (!creature) {
+            res.status(404).send("creature not found");
+            return;
+        }
+
+        let voted = [];
+        creature.votes.forEach(x => {
+            voted.push(x._id.toString());
+        });
+
+        let hasVoted = voted.includes(req.user?._id.toString());
+        let isAnyVote = creature.votes.length>0
+        const isOwner = req.user?._id.toString() === creature.owner._id.toString();
+        const isLogged = Boolean(req.user);
+
+        res.render('creatures/details', { ...creature, count, isOwner, isLogged, hasVoted, isAnyVote });
+
+    } catch (error) {
+        res.status(500).send('An error occurred while retrieving creature details.');
+        console.log(error);
+    }
+});
+
+
+router.get('/:creatureId/edit', async (req, res) => {
+    const creatureId = req.params.creatureId;
+
+    try {
+        const creature = await tripManager.getOne(creatureId).lean();
+        res.render('creatures/edit', { ...creature })
+
+    } catch (error) {
+        res.render('home', { error: 'Edit creature Edit page failed' })
+    }
+});
+
+router.post('/:creatureId/edit', async (req, res) => {
+    const creatureId = req.params.creatureId;
+    const creatureData = req.body
+
+    try {
+        const creature = await tripManager.edit(creatureId, creatureData);
+        res.redirect(`/creatures/${creatureId}/details`);
+    } catch (error) {
+        res.render('creatures/edit', { error: 'Unable to update creature', ...creatureData })
+    }
+
+});
+
+router.get('/:creatureId/delete', async (req, res) => {
+
+    try {
+        const creatureId = req.params.creatureId;
+        await tripManager.delete(creatureId);
+        res.redirect('/creatures')
+
+    } catch (error) {
+        res.redirect(`/creatures/${creatureId}/details`, { error: 'Unsuccessful deletion' })
+    }
+
+})
+
+router.get('/:creatureId/vote', async (req, res) => {
+    const creatureId = req.params.creatureId;
+    const user = req.user;
+    const creature = await tripManager.getOne(creatureId).lean();
+
+    const isOwner = req.user?._id.toString() === creature.owner._id.toString();
+    const isLogged = Boolean(req.user);
+    // console.log(isLogged);
+
+    if (isLogged && !isOwner) {
+        try {
+            await tripManager.vote(creatureId, user._id);
+            res.redirect(`/creatures/${creatureId}/details`);
+        } catch (err) {
+
+            console.log(err);
+            res.render('creatures/details', {
+                ...creature,
+                error: 'You cannot vote',
+                isOwner,
+                isLogged,
+            });
+        }
+    } else {
+        res.redirect(`/creatures/${creatureId}/details`);
+    }
+});
+
+module.exports = router;
