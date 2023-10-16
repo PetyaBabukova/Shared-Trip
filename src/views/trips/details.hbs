@@ -16,13 +16,14 @@
                 <i class="fas fa-users buddies"></i>
                 <h5>Shared trip Buddies</h5>
                 <div>
+                    {{#each mates}}
                     <!-- if there are joined buddies for the current trip separate them with comma and space", " -->
-                    <p>peter@abv.bg, marry@abv.bg</p>
-
+                    <p>{{email}}, </p>
+                    {{/each}}
                     <!-- If not display: -->
                     <p>there are no buddies yet...</p>
                 </div>
-                <h5>Driver: <span>mihail_valkov@mail.bg</span> </h5>
+                <h5>Driver: <span>{{owner.email}}</span> </h5>
             </div>
             <p class="line"></p>
             <h5 class="brand">Car Brand: <span class="lead">{{brand}}</span></h5>

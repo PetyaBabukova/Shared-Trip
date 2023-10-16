@@ -61,12 +61,14 @@ router.get('/:tripId/details', async (req, res) => {
             joined.push(x._id.toString());
         });
 
+
+
         let hasJoined = joined.includes(req.user?._id.toString());
         let isAnyJoined = trip.join.length>0
         const isOwner = req.user?._id.toString() === trip.owner._id.toString();
         const isLogged = Boolean(req.user);
 
-        res.render('trips/details', { ...trip, isOwner, isLogged, hasJoined, isAnyJoined, availableSeats, isAvailableSeats });
+        res.render('trips/details', { ...trip, isOwner, isLogged, hasJoined, isAnyJoined, availableSeats, isAvailableSeats, mates:trip.join });
 
     } catch (error) {
         res.status(500).send('An error occurred while retrieving trip details.');
