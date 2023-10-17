@@ -19,9 +19,10 @@
                     {{#each mates}}
                     <!-- if there are joined buddies for the current trip separate them with comma and space", " -->
                     <p>{{email}}, </p>
-                    {{/each}}
+                    {{else}}
                     <!-- If not display: -->
                     <p>there are no buddies yet...</p>
+                    {{/each}}
                 </div>
                 <h5>Driver: <span>{{owner.email}}</span> </h5>
             </div>

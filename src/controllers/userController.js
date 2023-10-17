@@ -1,9 +1,8 @@
 const router = require('express').Router();
 const userManager = require('../managers/userManager');
-const tripManager = require('../managers/tripManager');
 const { TOKEN_KEY } = require('../config/config');
 const { getErrorMessage } = require('../utils/errorHelpers');
-const Trip = require('../models/Trip');
+const mongoose = require('mongoose')
 
 router.get('/login', (req, res) => {
     res.render('users/login')
@@ -41,7 +40,11 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         res.render('users/register', { error: getErrorMessage(err), email });
         console.log(err);
+        console.log(err instanceof mongoose.Error.ValidationError);
+
+        
     }
+
 
 });
 

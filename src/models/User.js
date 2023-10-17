@@ -6,20 +6,19 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, 'Email is required'],
-        // minLength:10
+        match: [/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, 'Invalid email']
     },
 
     password: {
         type: String,
         required: [true, 'Password is required'],
-        // minLength: 4
+        minLength: [4, 'Password should be 4 charactes at least']
     },
     
     gender: {
         type: String,
         enum: ['male', 'female'],
         required: [true, 'Gender is required'],
-        // minLength: 4
     },
 
     history: {
