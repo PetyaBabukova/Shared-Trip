@@ -1,4 +1,5 @@
 const Trip = require('../models/Trip');
+const User = require('../models/User');
 
 exports.create = (TripData) => Trip.create(TripData);
 
@@ -10,13 +11,20 @@ exports.edit = (TripId, TripData) => Trip.findByIdAndUpdate(TripId, TripData);
 
 exports.delete = (TripId,) => Trip.findByIdAndDelete(TripId);
 
-exports.join = async (TripId, userId) => {
-    const trip = await Trip.findById(TripId);
+exports.join = async (tripId, userId) => {
+    const trip = await Trip.findById(tripId);
+    const user = await User.findById(userId);
 
     if (!trip.join.includes(userId.toString())) {
         trip.join.push(userId);
         await trip.save();
-    }
+    };
+
+    if(!user.history.includes(tripId)){
+        user.history.push(tripId);
+        await user.save()
+    };
+
     return trip;
 };
 

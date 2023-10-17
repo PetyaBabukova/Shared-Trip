@@ -1,13 +1,15 @@
 const router = require('express').Router();
 const tripManager = require('../managers/tripManager');
-let {isAuth} = require('../middlewares/authMiddleware')
+let {isAuth} = require('../middlewares/authMiddleware');
+const { getErrorMessage } = require('../utils/errorHelpers');
+
 
 router.get('/',  async (req, res) => {
     try {
-        await tripManager.getAll();
-        res.render('trips/shared-trips', );
-    } catch (error) {
-        res.status(404).render('home', { error: 'Failed to fetch trips.' });
+        const trips = await tripManager.getAll();
+        res.render('trips/shared-trips', {trips});
+    } catch (err) {
+        res.status(404).render('home', { error: getErrorMessage(err) });
     }
 });
 
@@ -15,8 +17,8 @@ router.get('/create', isAuth, (req, res) => {
     try {
         res.render('trips/create', );
 
-    } catch (error) {
-        res.status(404).render('home', { error: 'Failed to get Add trips page.' });
+    } catch (err) {
+        res.status(404).render('home', { error: getErrorMessage(err) });
     }
 });
 
@@ -31,12 +33,9 @@ router.post('/create', isAuth, async (req, res) => {
         await tripManager.create(tripData)
         res.redirect('/trips', )
 
-    } catch (error) {
+    } catch (err) {
 
-        res.render('trips/create', {
-            error: 'Trip creation failed',
-            data: tripData
-        });
+        res.render('trips/create', { error: getErrorMessage(err) });
     }
 });
 

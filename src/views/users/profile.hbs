@@ -1,35 +1,24 @@
-<main>
-    <section id="my-posts">
-        <h1>My post</h1>
-
-        <div class="my-container">
-
-            {{#each ownCreatures}}
-<div class="my-card">
-    <div class="card-header">
-        <img src="{{image}}" />
-    </div>
-    <div class="card-body">
-        <span class="tag tag-teal">Species: {{species}}</span>
-        <h4>
-            Name: {{name}}
-        </h4>
-        <div class="user">
-            <div class="user-info">
-                <h5>Author: {{owner.firstName}} {{owner.lastName}} </h5>
-                <small>Rating of votes: {{votes.length}}</small>
-                <a href="/creatures/{{_id}}/details" class="details_btn">Details</a>
+    <main>
+        <section class="profile col-md-6 text-center col-lg" id="profile-page">
+            <div class="profile-container">
+                <!-- Do not forget to change the path to the image -->
+                <!-- Gender of the user determines which picture is displayed as their avatar -->
+                <img class="profile-img" src="/images/male.png">
+                <p>Email: <span>{{email}}</span></p>
             </div>
-        </div>
-    </div>
-</div>
-{{else}}
-<div class="no-posts">
-    <p class="no-offer">There are no own posts yet...</p>
-</div>
-{{/each}}
+            <div class="profile-info">
+                <p>Trips History: <span>{{count}}</span> counts</p>
+                {{#each userInfo}}
+                <div class="trips-info">
+                    <!-- If there are trips created by the current logged in user display each of them -->
+                    <p>from <span>{{start}}</span> to <span>{{end}}</span> on <span>{{date}}</span> at
+                        <span>{{time}}</span></p>
+                    {{else}}
 
-        </div>
-    </section>
-
-</main>
+                    <!-- If there are no trips created by the current logged in user display:-->
+                    <p>there are no offer trips yet...</p>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+    </main>

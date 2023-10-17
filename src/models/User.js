@@ -21,10 +21,10 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Gender is required'],
     },
 
-    history: {
+    history: [{
         type: mongoose.Types.ObjectId,
         ref: 'User'
-    }
+    }]
 
 });
 

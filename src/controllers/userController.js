@@ -2,7 +2,9 @@ const router = require('express').Router();
 const userManager = require('../managers/userManager');
 const { TOKEN_KEY } = require('../config/config');
 const { getErrorMessage } = require('../utils/errorHelpers');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const Trip = require('../models/Trip');
 
 router.get('/login', (req, res) => {
     res.render('users/login')
@@ -15,7 +17,7 @@ router.post('/login', async (req, res) => {
         const token = await userManager.login(email, password);
 
         res.cookie(TOKEN_KEY, token);
-        res.redirect('/' );
+        res.redirect('/');
 
     } catch (err) {
         console.log(err);
@@ -34,7 +36,7 @@ router.post('/register', async (req, res) => {
 
     try {
         const token = await userManager.register({ email, password, repeatPassword, gender, history });
-        res.cookie(TOKEN_KEY, token); 
+        res.cookie(TOKEN_KEY, token);
         res.redirect('/');
 
     } catch (err) {
@@ -42,7 +44,7 @@ router.post('/register', async (req, res) => {
         console.log(err);
         console.log(err instanceof mongoose.Error.ValidationError);
 
-        
+
     }
 
 
@@ -54,18 +56,21 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-// router.get('/profile', async (req, res) =>{
+router.get('/profile', async (req, res) => {
+    try {
 
-//     await tripManager.getAllOwnCreatures(req.user._id)
-//     .then(ownCreatures => {
 
-//         res.render('users/profile', { ownCreatures: ownCreatures });
-//     })
-//     .catch(err => console.log(err));
-
+        const userInfo = await userManager.getUserInfo(req.user._id)
+        res.render('users/profile', {userInfo, email:req.user.email, count:userInfo.length });
+    } catch (error) {
         
-    
-// })
+    }
+
+
+
+
+
+})
 
 
 

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Trip = require('../models/Trip');
 const bcrypt = require('bcrypt');
 const jwt = require('../lib/jwt');
 const { SECRET } = require('../config/config')
@@ -45,3 +46,17 @@ async function generateToken(user) {
     const token = await jwt.sign(playload, SECRET, { expiresIn: '2d' });
     return token;
 };
+
+exports.getUserInfo = async(userId) => {
+    const currentUser = await User.findById(userId).lean();
+    
+    const usersTripsPromises = currentUser.history.map(async x => {
+        return await Trip.findById(x.toString()).lean();
+    });
+    
+    const usersTrips = await Promise.all(usersTripsPromises);
+    
+    return usersTrips;
+}
+
+
