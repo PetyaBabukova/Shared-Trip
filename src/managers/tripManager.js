@@ -12,18 +12,15 @@ exports.edit = (TripId, TripData) => Trip.findByIdAndUpdate(TripId, TripData);
 exports.delete = (TripId,) => Trip.findByIdAndDelete(TripId);
 
 exports.join = async (tripId, userId) => {
-    console.log(`Attempting to join user ${userId} to trip ${tripId}`);
 
     const trip = await Trip.findById(tripId);
     const user = await User.findById(userId);
 
     if (!trip) {
-        console.error(`Trip with ID ${tripId} not found`);
         throw new Error("Trip not found");
     }
 
     if (!user) {
-        console.error(`User with ID ${userId} not found`);
         throw new Error("User not found");
     }
 
