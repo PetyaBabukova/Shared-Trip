@@ -3,6 +3,8 @@ const homeController = require('./controllers/homeController');
 const userController = require('./controllers/userController');
 const tripController = require('./controllers/tripController');
 
+
+
 router.use(homeController);
 router.use( '/users', userController);
 router.use( '/trips', tripController);

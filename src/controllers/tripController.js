@@ -4,8 +4,8 @@ let {isAuth} = require('../middlewares/authMiddleware')
 
 router.get('/',  async (req, res) => {
     try {
-        const trips = await tripManager.getAll();
-        res.render('trips/shared-trips', { trips, email:req.user?.email });
+        await tripManager.getAll();
+        res.render('trips/shared-trips', );
     } catch (error) {
         res.status(404).render('home', { error: 'Failed to fetch trips.' });
     }
@@ -13,7 +13,7 @@ router.get('/',  async (req, res) => {
 
 router.get('/create', isAuth, (req, res) => {
     try {
-        res.render('trips/create', {email:req.user?.email});
+        res.render('trips/create', );
 
     } catch (error) {
         res.status(404).render('home', { error: 'Failed to get Add trips page.' });
@@ -29,7 +29,7 @@ router.post('/create', isAuth, async (req, res) => {
 
     try {
         await tripManager.create(tripData)
-        res.redirect('/trips', {email:req.user?.email})
+        res.redirect('/trips', )
 
     } catch (error) {
 
@@ -67,7 +67,7 @@ router.get('/:tripId/details', async (req, res) => {
         const isOwner = req.user?._id.toString() === trip.owner._id.toString();
         const isLogged = Boolean(req.user);
 
-        res.render('trips/details', { ...trip, isOwner, isLogged, hasJoined, isAnyJoined, availableSeats, isAvailableSeats, mates:trip.join, email:req.user?.email });
+        res.render('trips/details', { ...trip, isOwner, isLogged, hasJoined, isAnyJoined, availableSeats, isAvailableSeats, mates:trip.join,  });
 
     } catch (error) {
         res.status(500).send('An error occurred while retrieving trip details.');
@@ -81,7 +81,7 @@ router.get('/:tripId/edit', isAuth, async (req, res) => {
 
     try {
         const trip = await tripManager.getOne(tripId).lean();
-        res.render('trips/edit', { ...trip, email:req.user?.email })
+        res.render('trips/edit', { ...trip, })
 
     } catch (error) {
         res.render('home', { error: 'Edit trip Edit page failed' })
@@ -94,7 +94,7 @@ router.post('/:tripId/edit', isAuth, async (req, res) => {
 
     try {
         const trip = await tripManager.edit(tripId, tripData);
-        res.redirect(`/trips/${tripId}/details`, {email:req.user?.email});
+        res.redirect(`/trips/${tripId}/details`, );
     } catch (error) {
         res.render('trips/edit', { error: 'Unable to update trip', ...tripData })
     }
@@ -110,7 +110,7 @@ router.get('/:tripId/delete', async (req, res) => {
     try {
         const tripId = req.params.tripId;
         await tripManager.delete(tripId);
-        res.redirect('/trips', {email:req.user?.email})
+        res.redirect('/trips', )
 
     } catch (error) {
         res.redirect(`/trips/${tripId}/details`, { error: 'Unsuccessful deletion' })
@@ -130,7 +130,7 @@ router.get('/:tripId/join', isAuth, async (req, res) => {
     if (isLogged && !isOwner) {
         try {
             await tripManager.join(tripId, user._id);
-            res.redirect(`/trips/${tripId}/details`, {email:req.user?.email});
+            res.redirect(`/trips/${tripId}/details`);
         } catch (err) {
 
             console.log(err);
