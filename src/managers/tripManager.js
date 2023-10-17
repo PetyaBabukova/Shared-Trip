@@ -11,24 +11,6 @@ exports.edit = (TripId, TripData) => Trip.findByIdAndUpdate(TripId, TripData);
 
 exports.delete = (TripId,) => Trip.findByIdAndDelete(TripId);
 
-// exports.join = async (tripId, userId) => {
-//     const trip = await Trip.findById(tripId);
-//     // const user = await User.findById(userId);
-
-//     if (!trip.join.includes(userId.toString())) {
-//         trip.join.push(userId);
-//         await trip.save();
-//     };
-
-//     if(!user.history.includes(tripId)){
-//         user.history.push(tripId);
-//         await user.save()
-//     };
-
-//     return trip;
-// };
-
-
 exports.join = async (tripId, userId) => {
     console.log(`Attempting to join user ${userId} to trip ${tripId}`);
 

@@ -41,12 +41,7 @@ router.post('/register', async (req, res) => {
 
     } catch (err) {
         res.render('users/register', { error: getErrorMessage(err), email });
-        console.log(err);
-        console.log(err instanceof mongoose.Error.ValidationError);
-
-
     }
-
 
 });
 
@@ -58,12 +53,14 @@ router.get('/logout', (req, res) => {
 
 router.get('/profile', async (req, res) => {
     try {
+        const userInfo = await userManager.getUserTrips(req.user?._id)
+        const user = await userManager.getUser(req.user._id) 
+        let isMale = user.gender == 'male'
 
+        res.render('users/profile', {userInfo, email:req.user.email, count:userInfo.length, isMale });
+    } catch (err) {
+        res.render('home', { error: getErrorMessage(err) });
 
-        const userInfo = await userManager.getUserInfo(req.user?._id)
-        res.render('users/profile', {userInfo, email:req.user.email, count:userInfo.length });
-    } catch (error) {
-        
     }
 
 })

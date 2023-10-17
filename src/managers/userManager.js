@@ -47,7 +47,7 @@ async function generateToken(user) {
     return token;
 };
 
-exports.getUserInfo = async(userId) => {
+exports.getUserTrips = async(userId) => {
     const currentUser = await User.findById(userId).lean();
     
     const usersTripsPromises = currentUser.history.map(async x => {
@@ -57,6 +57,8 @@ exports.getUserInfo = async(userId) => {
     const usersTrips = await Promise.all(usersTripsPromises);
     
     return usersTrips;
-}
+};
+
+exports.getUser = (userId)=> User.findById(userId).lean()
 
 
