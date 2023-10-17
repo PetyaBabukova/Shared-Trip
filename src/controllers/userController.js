@@ -60,21 +60,13 @@ router.get('/profile', async (req, res) => {
     try {
 
 
-        const userInfo = await userManager.getUserInfo(req.user._id)
+        const userInfo = await userManager.getUserInfo(req.user?._id)
         res.render('users/profile', {userInfo, email:req.user.email, count:userInfo.length });
     } catch (error) {
         
     }
 
-
-
-
-
 })
-
-
-
-
 
 
 module.exports = router;

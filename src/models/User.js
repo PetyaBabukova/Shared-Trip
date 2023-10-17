@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
 
     history: [{
         type: mongoose.Types.ObjectId,
-        ref: 'User'
+        ref: 'Trip'
     }]
 
 });
@@ -36,10 +36,26 @@ userSchema.virtual('repeatPassword')
     });
 
     //hash password
-    userSchema.pre('save', async function () {
-        const hash = await bcrypt.hash(this.password, 10);
-        this.password = hash
+    // userSchema.pre('save', async function () {
+    //     const hash = await bcrypt.hash(this.password, 10);
+    //     this.password = hash
+    // });
+
+
+    userSchema.pre('save', async function (next) {
+        if (!this.isModified('password')) {
+            return next(); // if password hasn't changed, move on
+        }
+    
+        try {
+            const hash = await bcrypt.hash(this.password, 10);
+            this.password = hash;
+            next();
+        } catch (error) {
+            next(error);
+        }
     });
+    
 
 const User = mongoose.model('User', userSchema);
 

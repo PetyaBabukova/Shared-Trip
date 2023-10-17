@@ -35,7 +35,7 @@ router.post('/create', isAuth, async (req, res) => {
 
     } catch (err) {
 
-        res.render('trips/create', { error: getErrorMessage(err) });
+        res.render('trips/create', { error: getErrorMessage(err), ...tripData });
     }
 });
 
